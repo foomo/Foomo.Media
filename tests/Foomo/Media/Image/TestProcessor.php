@@ -29,12 +29,11 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 
 	public function testImageResize()
 	{
-		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'image1.jpeg';
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
 		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.jpg';
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = 100, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false);
 
-		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = 100, $format = 'jpeg', $convertColorspaceToRGB = false);
 		$this->assertTrue($success);
-
 		$this->assertTrue(file_exists($destinationFile), 'destination file doews not exist');
 
 		$img = new \Imagick();
@@ -46,10 +45,10 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 
 	public function testConvertFormat()
 	{
-		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'image1.jpeg';
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
 		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.png';
 
-		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = 100, $format = 'png', $convertColorspaceToRGB = false);
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = 100, $format = Processor::FORMAT_PNG, $convertColorspaceToRGB = false);
 		$this->assertTrue($success);
 
 		$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
@@ -58,8 +57,51 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 		$img->readImage($destinationFile);
 		$this->assertEquals(100, $img->getimagewidth());
 		$this->assertEquals(100, $img->getimageheight());
-		
-		$this->assertEquals('PNG', $img->getimageformat());
+
+		$this->assertEquals(Processor::FORMAT_PNG, $img->getimageformat());
+		unlink($destinationFile);
+	}
+
+	public function testCMYKtoRGBConversion()
+	{
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'cmyk.jpg';
+		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.jpg';
+
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = 100, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = true);
+		$this->assertTrue($success);
+
+		$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
+
+		$img = new \Imagick();
+		$img->readImage($destinationFile);
+		$this->assertEquals(100, $img->getimagewidth());
+		$this->assertEquals(100, $img->getimageheight());
+
+		$this->assertTrue(($img->getImageColorspace() == \Imagick::COLORSPACE_RGB), 'color space is not cymk');
+
+		$this->assertEquals(Processor::FORMAT_JPEG, $img->getimageformat());
+		unlink($destinationFile);
+	}
+
+	public function testSetQuality()
+	{
+		$qualitySetting = 22;
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
+		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.jpg';
+
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = $qualitySetting, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = true);
+		$this->assertTrue($success);
+
+		$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
+
+		$img = new \Imagick();
+		$img->readImage($destinationFile);
+		$this->assertEquals(100, $img->getimagewidth());
+		$this->assertEquals(100, $img->getimageheight());
+
+		$this->assertEquals($qualitySetting, $img->getimagecompressionquality(), 'quality does not match');
+
+		$this->assertEquals(Processor::FORMAT_JPEG, $img->getimageformat());
 		unlink($destinationFile);
 	}
 
