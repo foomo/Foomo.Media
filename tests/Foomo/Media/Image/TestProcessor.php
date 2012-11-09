@@ -104,6 +104,27 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(Processor::FORMAT_JPEG, $img->getimageformat());
 		unlink($destinationFile);
 	}
+	
+	
+	public function testMakeThumb()
+	{
+	
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
+		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.git';
+
+		$success = \Foomo\Media\Image\Processor::makeThumb($sourceFile, $destinationFile, $size = 200, $format = Processor::FORMAT_GIF);
+		$this->assertTrue($success);
+
+		$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
+
+		$img = new \Imagick();
+		$img->readImage($destinationFile);
+		$this->assertEquals(142, $img->getimagewidth());
+		$this->assertEquals(200, $img->getimageheight());
+
+		$this->assertEquals(Processor::FORMAT_GIF, $img->getimageformat());
+		unlink($destinationFile);
+	}
 
 }
 

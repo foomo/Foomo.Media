@@ -61,7 +61,6 @@ class Processor
 		// create new Imagick object
 		$img = new \Imagick();
 		$extension = $ext = pathinfo($filename, PATHINFO_EXTENSION);
-
 		if ($extension == 'pdf') {
 			$img->readImage($filename . '[0]');
 			//make sure we do not get inverted pdfs
@@ -74,10 +73,10 @@ class Processor
 
 		// Resizes to whichever is larger, width or height
 		if ($img->getImageHeight() <= $img->getImageWidth()) {
-			return self::resizeImage($filename, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB);
+			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB);
 		} else {
 			$img->resizeImage(0, $size, \Imagick::FILTER_LANCZOS, 1);
-			return self::resizeImage($filename, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB);
+			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB);
 		}
 	}
 
