@@ -108,7 +108,6 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 	
 	public function testMakeThumb()
 	{
-	
 		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
 		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.git';
 
