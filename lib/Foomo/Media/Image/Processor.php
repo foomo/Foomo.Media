@@ -36,16 +36,18 @@ class Processor
 	 * @param string $filename
 	 * @param string $destination
 	 * @param string $size
-	 * @format string one of self::FORMAT_
+	 * @param string $format one of self::FORMAT_
+	 * @param boolean $keepAspectRatio
+	 * @param booleasn $addBorder adds border. only effective if $keepAspectRatio is true
 	 * @return boolean $success
 	 */
-	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false)
+	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder=false)
 	{
 		// create new Imagick object
 
 		$img = new \Imagick();
 		$img->readImage($filename);
-		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB);
+		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder);
 	}
 
 	/**
@@ -94,10 +96,18 @@ class Processor
 		return $img;
 	}
 
-	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false)
+	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB=false, $keepAspectRatio=false, $addBorder=false)
 	{
-		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
-
+		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
+		
+		if ($addBorder) {
+		 $color=new \ImagickPixel();
+		 $color->setColor("rgb(255,255,255)");
+		 $img->borderImage($color,($width- $img->getimagewidth())/2,($height- $img->getimageheight())/2);
+		 if ($img->getimagewidth() != $width || $img->getimageheight() != $height) {
+			$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
+		 }
+		}
 		if ($format == Processor::FORMAT_JPEG) {
 			// set jpeg format
 			$img->setImageFormat($format);
