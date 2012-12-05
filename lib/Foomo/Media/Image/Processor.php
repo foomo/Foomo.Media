@@ -123,4 +123,23 @@ class Processor
 		return $success;
 	}
 
+	/**
+	 * map a filetype (JPEG, PNG, GIF) to its corresponding file extension
+	 * 
+	 * @param string $filetype
+	 * @return string file extension (jpg, png, gif)
+	 */
+	public static function getFileExtensionByFileFormat($filetype)
+	{
+		switch ($filetype) {
+			case self::FORMAT_JPEG:
+				return 'jpg';
+			case self::FORMAT_PNG:
+				return 'png';
+			case self::FORMAT_GIF:
+				return 'gif';
+			default:
+				return 'jpg';
+		}
+	}	
 }
