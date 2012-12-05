@@ -31,7 +31,7 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 	{
 		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
 		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.jpg';
-		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = 100, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false);
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 100, $height = 100, $quality = 100, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false,false,false);
 
 		$this->assertTrue($success);
 		$this->assertTrue(file_exists($destinationFile), 'destination file doews not exist');
@@ -40,6 +40,7 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 		$img->readImage($destinationFile);
 		$this->assertEquals(100, $img->getimagewidth());
 		$this->assertEquals(100, $img->getimageheight());
+		
 		unlink($destinationFile);
 	}
 
