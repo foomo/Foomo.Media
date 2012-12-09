@@ -133,53 +133,17 @@ class Processor
 		$img->destroy();
 		return $success;
 	}
+	
 
-	/**
-	 * map a filetype (JPEG, PNG, GIF) to its corresponding file extension
-	 * 
-	 * @param string $filetype
-	 * @return string file extension (jpg, png, gif)
-	 */
 	public static function getFileExtensionByFileFormat($filetype)
 	{
-		switch ($filetype) {
-			case self::FORMAT_JPEG:
-				return 'jpg';
-			case self::FORMAT_PNG:
-				return 'png';
-			case self::FORMAT_TIF:
-				return 'tif';
-			case self::FORMAT_GIF:
-				return 'gif';
-			default:
-				return 'jpg';
-		}
+		\trigger_error(__METHOD__, \E_DEPRECATED);
+		return \Foomo\Media\Image\Utils::getFileExtensionByFileFormat($filetype);
 	}
 
-	/**
-	 * map a file extension to its corresponding filetype (JPEG, PNG, GIF)
-	 * 
-	 * @param string $fileExtension
-	 * @return string
-	 */
 	public static function getFileFormatByFileExtension($fileExtension)
 	{
-		$fileExtension = \strtolower($fileExtension);
-		switch ($fileExtension) {
-			case 'jpg':
-				return self::FORMAT_JPEG;
-			case 'jpeg':
-				return self::FORMAT_JPEG;
-			case 'png':
-				return self::FORMAT_PNG;
-			case 'gif':
-				return self::FORMAT_GIF;
-			case 'tif':
-				return self::FORMAT_TIF;
-			case 'tiff':
-				return self::FORMAT_TIF;
-			default:
-				return self::FORMAT_JPEG;
-		}
+		\trigger_error(__METHOD__, \E_DEPRECATED);
+		return \Foomo\Media\Image\Utils::getFileFormatByFileExtension($fileExtension);
 	}
 }
