@@ -41,7 +41,7 @@ class Utils
 	public static function getImageSize($file)
 	{
 		list($width, $height) = getimagesize($file);
-		return array('width' => $width, 'height' => $height);
+		return array('0' => $width, '1' => $height, 'width' => $width, 'height' => $height);
 	}
 
 	/**
@@ -73,7 +73,7 @@ class Utils
 				$targetHeight = $height;
 			}
 		}
-		return array('width' => $targetWidth, 'height' => $targetHeight);
+		return array('0' => $targetWidth, '1' => $targetHeight, 'width' => $targetWidth, 'height' => $targetHeight);
 	}
 	
 	/**
