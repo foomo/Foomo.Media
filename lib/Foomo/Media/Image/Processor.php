@@ -41,13 +41,13 @@ class Processor
 	 * @param booleasn $addBorder adds border. only effective if $keepAspectRatio is true
 	 * @return boolean $success
 	 */
-	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder=false)
+	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder=false, $imageSharpenParams=array())
 	{
 		// create new Imagick object
 
 		$img = new \Imagick();
 		$img->readImage($filename);
-		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder);
+		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder, $imageSharpenParams);
 	}
 
 	/**
@@ -96,7 +96,7 @@ class Processor
 		return $img;
 	}
 
-	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB=false, $keepAspectRatio=false, $addBorder=false)
+	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB=false, $keepAspectRatio=false, $addBorder=false, $imageSharpenParams=array())
 	{
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
 		
@@ -123,6 +123,10 @@ class Processor
 			self::convertColorSpaceCYMKtoRGB($img);
 		}
 
+		if (isset($imageSharpenParams['radius']) && isset($imageSharpenParams['sigma'])) {
+			$img->sharpenImage($imageSharpenParams['radius'], $imageSharpenParams['sigma']);
+		}	
+		
 		// Strip out unneeded meta data
 		$img->stripImage();
 		// Writes resultant image to output directory

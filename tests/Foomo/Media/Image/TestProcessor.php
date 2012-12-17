@@ -125,6 +125,25 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(Processor::FORMAT_GIF, $img->getimageformat());
 		unlink($destinationFile);
 	}
+	
+	
+	public function testSharpen()
+	{
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'large.jpg';
+		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.jpg';
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 644, $height = 1088, $quality = 100, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false,false,false, array('radius'=>2,'sigma' => 1));
+
+		$this->assertTrue($success);
+		$this->assertTrue(file_exists($destinationFile), 'destination file doews not exist');
+
+		$img = new \Imagick();
+		$img->readImage($destinationFile);
+		$this->assertEquals(644, $img->getimagewidth());
+		$this->assertEquals(1088, $img->getimageheight());
+		
+		//unlink($destinationFile);
+		var_dump($destinationFile);
+	}
 
 }
 
