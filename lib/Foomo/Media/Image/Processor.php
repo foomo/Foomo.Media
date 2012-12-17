@@ -30,6 +30,7 @@ class Processor
 	const FORMAT_JPEG = 'JPEG';
 	const FORMAT_GIF = 'GIF';
 	const FORMAT_PNG = 'PNG';
+	const FORMAT_TIF = 'TIF';
 
 	/**
 	 * resize image
@@ -136,5 +137,17 @@ class Processor
 		$img->destroy();
 		return $success;
 	}
+	
 
+	public static function getFileExtensionByFileFormat($filetype)
+	{
+		\trigger_error(__METHOD__, \E_DEPRECATED);
+		return \Foomo\Media\Image\Utils::getFileExtensionByFileFormat($filetype);
+	}
+
+	public static function getFileFormatByFileExtension($fileExtension)
+	{
+		\trigger_error(__METHOD__, \E_DEPRECATED);
+		return \Foomo\Media\Image\Utils::getFileFormatByFileExtension($fileExtension);
+	}
 }
