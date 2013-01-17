@@ -134,15 +134,36 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 644, $height = 1088, $quality = 100, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false,false,false, array('radius'=>2,'sigma' => 1));
 
 		$this->assertTrue($success);
-		$this->assertTrue(file_exists($destinationFile), 'destination file doews not exist');
+		$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
 
 		$img = new \Imagick();
 		$img->readImage($destinationFile);
 		$this->assertEquals(644, $img->getimagewidth());
 		$this->assertEquals(1088, $img->getimageheight());
 		
+		unlink($destinationFile);
+		//var_dump($destinationFile);
+	}
+	
+	
+	public function testPNGBorder()
+	{
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'large.jpg';
+		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.png';
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 1000, $height = 600, $quality = 100, $format = Processor::FORMAT_PNG, $convertColorspaceToRGB = false,true,true, array('radius'=>2,'sigma' => 1));
+
+		$this->assertTrue($success);
+		$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
+
+		$img = new \Imagick();
+		$img->readImage($destinationFile);
+		$this->assertEquals(1000, $img->getimagewidth());
+		$this->assertEquals(600, $img->getimageheight());
+		$borderColor = $img->getimagebordercolor();
+		$colorArray = $borderColor->getcolor();
+		$this->assertEquals(1,$colorArray['a'], 'alpha not 1 on border');
 		//unlink($destinationFile);
-		var_dump($destinationFile);
+		
 	}
 
 }

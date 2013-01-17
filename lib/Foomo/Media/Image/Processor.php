@@ -30,7 +30,7 @@ class Processor
 	const FORMAT_JPEG = 'JPEG';
 	const FORMAT_GIF = 'GIF';
 	const FORMAT_PNG = 'PNG';
-	const FORMAT_TIF = 'TIF';
+	const FORMAT_TIFF = 'TIFF';
 
 	/**
 	 * resize image
@@ -42,10 +42,9 @@ class Processor
 	 * @param booleasn $addBorder adds border. only effective if $keepAspectRatio is true
 	 * @return boolean $success
 	 */
-	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder=false, $imageSharpenParams=array())
+	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array())
 	{
 		// create new Imagick object
-
 		$img = new \Imagick();
 		$img->readImage($filename);
 		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder, $imageSharpenParams);
@@ -73,7 +72,6 @@ class Processor
 		} else {
 			$img->readImage($filename);
 		}
-
 		// Resizes to whichever is larger, width or height
 		if ($img->getImageHeight() <= $img->getImageWidth()) {
 			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB);
@@ -97,17 +95,22 @@ class Processor
 		return $img;
 	}
 
-	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB=false, $keepAspectRatio=false, $addBorder=false, $imageSharpenParams=array())
+	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array())
 	{
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
-		
+
 		if ($addBorder) {
-		 $color=new \ImagickPixel();
-		 $color->setColor("rgb(255,255,255)");
-		 $img->borderImage($color,($width- $img->getimagewidth())/2,($height- $img->getimageheight())/2);
-		 if ($img->getimagewidth() != $width || $img->getimageheight() != $height) {
-			$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
-		 }
+			$color = new \ImagickPixel();
+			if (in_array($format, array(Processor::FORMAT_TIFF, Processor::FORMAT_PNG, Processor::FORMAT_GIF ))) {
+				$color->setColor("transparent");
+			} else {
+				$color->setColor("rgb(255,255,255)");
+			}
+
+			$img->borderImage($color, ($width - $img->getimagewidth()) / 2, ($height - $img->getimageheight()) / 2);
+			if ($img->getimagewidth() != $width || $img->getimageheight() != $height) {
+				$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
+			}
 		}
 		if ($format == Processor::FORMAT_JPEG) {
 			// set jpeg format
@@ -121,13 +124,13 @@ class Processor
 		}
 
 		if ($convertColorspaceToRGB === true) {
-			self::convertColorSpaceCYMKtoRGB($img);
+		//	self::convertColorSpaceCYMKtoRGB($img);
 		}
 
 		if (isset($imageSharpenParams['radius']) && isset($imageSharpenParams['sigma'])) {
 			$img->sharpenImage($imageSharpenParams['radius'], $imageSharpenParams['sigma']);
-		}	
-		
+		}
+
 		// Strip out unneeded meta data
 		$img->stripImage();
 		// Writes resultant image to output directory
@@ -137,7 +140,6 @@ class Processor
 		$img->destroy();
 		return $success;
 	}
-	
 
 	public static function getFileExtensionByFileFormat($filetype)
 	{
@@ -150,4 +152,5 @@ class Processor
 		\trigger_error(__METHOD__, \E_DEPRECATED);
 		return \Foomo\Media\Image\Utils::getFileFormatByFileExtension($fileExtension);
 	}
+
 }
