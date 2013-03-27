@@ -39,7 +39,8 @@ class Processor
 	 * @param string $size
 	 * @param string $format one of self::FORMAT_
 	 * @param boolean $keepAspectRatio
-	 * @param booleasn $addBorder adds border. only effective if $keepAspectRatio is true
+	 * @param mixed $addBorder adds border. only effective if $keepAspectRatio is true, if array it is assumed to contain rgb values of the border 
+	 * @param array $imageSharpenParams $imageSharpenParams['radius'], $imageSharpenParams['sigma'] are floats
 	 * @return boolean $success
 	 */
 	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array())
@@ -99,19 +100,28 @@ class Processor
 	{
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
 
-		if ($addBorder) {
+		if ($addBorder === true || is_array($addBorder)) {
 			$color = new \ImagickPixel();
-			if (in_array($format, array(Processor::FORMAT_TIFF, Processor::FORMAT_PNG, Processor::FORMAT_GIF ))) {
-				$color->setColor("transparent");
-			} else {
-				$color->setColor("rgb(255,255,255)");
-			}
 
+			if (is_array($addBorder) && count($addBorder) == 3) {
+				$colorStr = implode(',', $addBorder);
+				$color->setColor("rgb(" . $colorStr . ")");
+			} else { //addBorder === true
+				if (in_array($format, array(Processor::FORMAT_TIFF, Processor::FORMAT_PNG, Processor::FORMAT_GIF))) {
+					$color->setColor("transparent");
+				} else {
+					$color->setColor("rgb(255,255,255)");
+				}
+			}
 			$img->borderImage($color, ($width - $img->getimagewidth()) / 2, ($height - $img->getimageheight()) / 2);
 			if ($img->getimagewidth() != $width || $img->getimageheight() != $height) {
 				$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1);
 			}
 		}
+
+
+
+
 		if ($format == Processor::FORMAT_JPEG) {
 			// set jpeg format
 			$img->setImageFormat($format);
@@ -124,7 +134,7 @@ class Processor
 		}
 
 		if ($convertColorspaceToRGB === true) {
-		//	self::convertColorSpaceCYMKtoRGB($img);
+			//	self::convertColorSpaceCYMKtoRGB($img);
 		}
 
 		if (isset($imageSharpenParams['radius']) && isset($imageSharpenParams['sigma'])) {
