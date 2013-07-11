@@ -30,11 +30,11 @@ class Module extends \Foomo\Modules\ModuleBase
 	// ~ Constants
 	//---------------------------------------------------------------------------------------------
 
+	const VERSION = '0.2.0';
 	/**
 	 * the name of this module
 	 *
 	 */
-
 	const NAME = 'Foomo.Media';
 
 	//---------------------------------------------------------------------------------------------
@@ -62,11 +62,12 @@ class Module extends \Foomo\Modules\ModuleBase
 	/**
 	 * get all the module resources
 	 *
-	 * @return Foomo\Modules\Resource[]
+	 * @return \Foomo\Modules\Resource[]
 	 */
 	public static function getResources()
 	{
 		return array(
+			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.*'),
 			\Foomo\Modules\Resource\PhpModule::getResource('imagick'),
 			\Foomo\Modules\Resource\CliCommand::getResource('gs'),
 			\Foomo\Modules\Resource\CliCommand::getResource('convert'),
