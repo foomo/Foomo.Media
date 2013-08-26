@@ -65,10 +65,11 @@ class Processor
 		$img = self::readImage($filename);
 		// Resizes to whichever is larger, width or height
 		if ($img->getImageHeight() <= $img->getImageWidth()) {
-			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB);
+			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 300);
 		} else {
 			$img->resizeImage(0, $size, \Imagick::FILTER_LANCZOS, 1);
-			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB);
+
+			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 300);
 		}
 	}
 
@@ -109,7 +110,7 @@ class Processor
 	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
 		$img->setResolution($resolution, $resolution);
-		
+
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
 
 		if ($addBorder === true || is_array($addBorder)) {
