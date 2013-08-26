@@ -41,13 +41,14 @@ class Processor
 	 * @param boolean $keepAspectRatio
 	 * @param mixed $addBorder adds border. only effective if $keepAspectRatio is true, if array it is assumed to contain rgb values of the border 
 	 * @param array $imageSharpenParams $imageSharpenParams['radius'], $imageSharpenParams['sigma'] are floats
+	 * @param float $resolution
 	 * @return boolean $success
 	 */
-	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array())
+	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 300)
 	{
 		// create new Imagick object
 		$img = self::readImage($filename);
-		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder, $imageSharpenParams);
+		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder, $imageSharpenParams, $resolution);
 	}
 
 	/**
@@ -105,8 +106,10 @@ class Processor
 		return $img;
 	}
 
-	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array())
+	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
+		$img->setResolution($resolution, $resolution);
+		
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
 
 		if ($addBorder === true || is_array($addBorder)) {
@@ -149,6 +152,8 @@ class Processor
 		if (isset($imageSharpenParams['radius']) && isset($imageSharpenParams['sigma'])) {
 			$img->sharpenImage($imageSharpenParams['radius'], $imageSharpenParams['sigma']);
 		}
+
+
 
 		// Strip out unneeded meta data
 		$img->stripImage();
