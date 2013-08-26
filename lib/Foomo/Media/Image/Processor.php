@@ -46,8 +46,7 @@ class Processor
 	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array())
 	{
 		// create new Imagick object
-		$img = new \Imagick();
-		$img->readImage($filename);
+		$img = self::readImage($filename);
 		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder, $imageSharpenParams);
 	}
 
@@ -62,6 +61,22 @@ class Processor
 	public static function makeThumb($filename, $destination, $size, $format, $convertColorspaceToRGB = true)
 	{
 		// create new Imagick object
+		$img = self::readImage($filename);
+		// Resizes to whichever is larger, width or height
+		if ($img->getImageHeight() <= $img->getImageWidth()) {
+			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB);
+		} else {
+			$img->resizeImage(0, $size, \Imagick::FILTER_LANCZOS, 1);
+			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB);
+		}
+	}
+
+	/**
+	 * read image or get a image representation of doc
+	 * @param $filename
+	 * @return \Imagick
+	 */
+	private static function readImage($filename) {
 		$img = new \Imagick();
 		$extension = $ext = pathinfo($filename, PATHINFO_EXTENSION);
 		if ($extension == 'pdf') {
@@ -73,13 +88,7 @@ class Processor
 		} else {
 			$img->readImage($filename);
 		}
-		// Resizes to whichever is larger, width or height
-		if ($img->getImageHeight() <= $img->getImageWidth()) {
-			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB);
-		} else {
-			$img->resizeImage(0, $size, \Imagick::FILTER_LANCZOS, 1);
-			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB);
-		}
+		return $img;
 	}
 
 	private static function convertColorSpaceCYMKtoRGB($img)
