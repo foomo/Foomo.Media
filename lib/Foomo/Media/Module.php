@@ -71,7 +71,8 @@ class Module extends \Foomo\Modules\ModuleBase
 			\Foomo\Modules\Resource\PhpModule::getResource('imagick'),
 			\Foomo\Modules\Resource\CliCommand::getResource('gs'),
 			\Foomo\Modules\Resource\CliCommand::getResource('convert'),
-			\Foomo\Modules\Resource\CliCommand::getResource('ffmpeg')
+			\Foomo\Modules\Resource\CliCommand::getResource('ffmpeg'),
+			\Foomo\Modules\Resource\CliCommand::getResource('pdfinfo')
 		);
 	}
 

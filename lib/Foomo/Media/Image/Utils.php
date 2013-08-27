@@ -18,6 +18,7 @@
  */
 
 namespace Foomo\Media\Image;
+use Foomo\CliCall;
 
 /**
  * @link www.foomo.org
@@ -41,6 +42,32 @@ class Utils
 	public static function getImageSize($file)
 	{
 		list($width, $height) = getimagesize($file);
+		return array('0' => $width, '1' => $height, 'width' => $width, 'height' => $height);
+	}
+
+	/**
+	 * get the width and height of a pdf file
+	 * uses the poppler-utils (popperlib)
+	 *
+	 * @param string $file
+	 *
+	 * @return array
+	 */
+	public static function getPdfSize($file)
+	{
+		$cli = new CliCall('pdfinfo', array($file));
+		$cli->execute();
+
+		if($cli->exitStatus == 0 && empty($cli->stdErr)) {
+			// find page sizes
+			preg_match('/Page size:\s+([0-9]{0,5}\.?[0-9]{0,3}) x ([0-9]{0,5}\.?[0-9]{0,3})\s(\w*)\s.*/', $cli->stdOut, $match);
+			$width = round($match[1]);
+			$height = round($match[2]);
+		} else {
+			$width = 0;
+			$height = 0;
+			$format = null;
+		}
 		return array('0' => $width, '1' => $height, 'width' => $width, 'height' => $height);
 	}
 
