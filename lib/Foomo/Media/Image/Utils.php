@@ -55,19 +55,28 @@ class Utils
 	 */
 	public static function getPdfSize($file)
 	{
+		//fix locale settings to handle unicode filenames
+		$locale = setlocale(LC_CTYPE, null);
+		setlocale(LC_CTYPE, "C.UTF-8");
+
+		//get pdfinfo via command line call
 		$cli = new CliCall('pdfinfo', array($file));
 		$cli->execute();
 
+		//reset locale settings
+		setlocale(LC_CTYPE, $locale);
+
+		// extract page sizes
 		if($cli->exitStatus == 0 && empty($cli->stdErr)) {
-			// find page sizes
 			preg_match('/Page size:\s+([0-9]{0,5}\.?[0-9]{0,3}) x ([0-9]{0,5}\.?[0-9]{0,3})\s(\w*)\s.*/', $cli->stdOut, $match);
 			$width = round($match[1]);
 			$height = round($match[2]);
 		} else {
-			$width = 0;
-			$height = 0;
-			$format = null;
+			$width = null;
+			$height = null;
+			trigger_error($cli->report);
 		}
+
 		return array('0' => $width, '1' => $height, 'width' => $width, 'height' => $height);
 	}
 
