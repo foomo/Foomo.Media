@@ -163,7 +163,42 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 		$colorArray = $borderColor->getcolor();
 		$this->assertEquals(1,$colorArray['a'], 'alpha not 1 on border');
 		//unlink($destinationFile);
-		
+	}
+
+	public function testResolution()
+	{
+		foreach(array(72,300) as $dpi) {
+			$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'resolution' . DIRECTORY_SEPARATOR . 'ski_300dpi.jpg';
+			$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'ski_'.$dpi.'dpi.png';
+			list($width, $height) = Utils::getImageSize($sourceFile);
+			var_dump($destinationFile);
+			$success = \Foomo\Media\Image\Processor::resizeImage(
+				$sourceFile,
+				$destinationFile,
+				$width,
+				$height,
+				$quality = 100,
+				$format = Processor::FORMAT_JPEG,
+				$convertColorspaceToRGB = false,
+				$keepAspectRatio = false,
+				$addBorder = false,
+				$imageSharpenParams = array(),
+				$dpi
+			);
+
+			$this->assertTrue($success);
+			$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
+
+
+			$im = new \Imagick($destinationFile);
+			$resolution = $im->getImageResolution();
+			$this->assertEquals($dpi, $resolution['x'], 'x-resolution does not match ' . $dpi . ' dpi');
+			$this->assertEquals($dpi, $resolution['y'], 'y-resolution does not match ' . $dpi . ' dpi');
+			var_dump($resolution);
+
+			//unlink($destinationFile);
+		}
+
 	}
 
 }
