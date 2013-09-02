@@ -44,7 +44,7 @@ class Processor
 	 * @param float $resolution
 	 * @return boolean $success
 	 */
-	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 300)
+	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72)
 	{
 		// create new Imagick object
 		$img = self::readImage($filename);
@@ -65,11 +65,11 @@ class Processor
 		$img = self::readImage($filename);
 		// Resizes to whichever is larger, width or height
 		if ($img->getImageHeight() <= $img->getImageWidth()) {
-			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 300);
+			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72);
 		} else {
 			$img->resizeImage(0, $size, \Imagick::FILTER_LANCZOS, 1);
 
-			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 300);
+			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72);
 		}
 	}
 
@@ -109,6 +109,7 @@ class Processor
 
 	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
+		//does not work for the moment
 		$img->setResolution($resolution, $resolution);
 
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
