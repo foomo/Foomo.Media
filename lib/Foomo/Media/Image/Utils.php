@@ -160,4 +160,59 @@ class Utils
 				return self::FORMAT_JPEG;
 		}
 	}
+
+	/**
+	 * map a mime type to its corresponding filetype (JPEG, PNG, GIF)
+	 *
+	 * @param $mime
+	 * @return string
+	 */
+	public static function getFileFormatByMimeType($mime)
+	{
+		$mime = \strtolower($mime);
+		switch ($mime) {
+			case 'image/jpeg':
+				return self::FORMAT_JPEG;
+			case 'image/jpg':
+				return self::FORMAT_JPEG;
+			case 'image/png':
+				return self::FORMAT_PNG;
+			case 'image/gif':
+				return self::FORMAT_GIF;
+			case 'image/tif':
+				return self::FORMAT_TIF;
+			case 'image/tiff':
+				return self::FORMAT_TIF;
+			default:
+				return self::FORMAT_JPEG;
+		}
+	}
+
+	/**
+	 * map a filetype (JPEG, PNG, GIF) to its corresponding file extension
+	 *
+	 * @param string $mimetype
+	 * @return string file extension (jpg, png, gif)
+	 */
+	public static function getFileExtensionByMimeType($mimetype)
+	{
+		switch ($mimetype) {
+			case 'image/jpeg':
+				return 'jpg';
+			case 'image/jpg':
+				return 'jpg';
+			case 'image/png':
+				return 'png';
+			case 'image/tif':
+				return 'tif';
+			case 'image/tiff':
+				return 'tif';
+			case 'image/gif':
+				return 'gif';
+			case 'application/pdf':
+				return 'pdf';
+			default:
+				return 'jpg';
+		}
+	}
 }
