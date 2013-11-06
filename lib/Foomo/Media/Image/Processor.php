@@ -18,6 +18,7 @@
  */
 
 namespace Foomo\Media\Image;
+use Foomo\Media\Image\Adaptive\Rules;
 
 /**
  * @link www.foomo.org
@@ -26,23 +27,48 @@ namespace Foomo\Media\Image;
  */
 class Processor
 {
-
 	const FORMAT_JPEG = 'JPEG';
 	const FORMAT_GIF = 'GIF';
 	const FORMAT_PNG = 'PNG';
 	const FORMAT_TIFF = 'TIFF';
 
 	/**
-	 * resize image
-	 * @param string $filename
+	 * @param ImageSpec $spec
 	 * @param string $destination
-	 * @param string $size
+	 *
+	 * @return bool
+	 */
+	public static function resizeImageWithSpec($spec, $destination)
+	{
+		//var_dump($spec);exit;
+		return self::resizeImage(
+			$spec->filename,
+			$destination,
+			$spec->width,
+			$spec->height,
+			$spec->quality,
+			$spec->format,
+			$spec->convertColorspaceToRGB,
+			$spec->keepAspectRatio,
+			$spec->addBorder,
+			array(),
+			$spec->resolution
+		);
+	}
+	/**
+	 * @param $filename
+	 * @param $destination
+	 * @param integer $width
+	 * @param integer $height
+	 * @param string $quality
 	 * @param string $format one of self::FORMAT_
-	 * @param boolean $keepAspectRatio
-	 * @param mixed $addBorder adds border. only effective if $keepAspectRatio is true, if array it is assumed to contain rgb values of the border 
-	 * @param array $imageSharpenParams $imageSharpenParams['radius'], $imageSharpenParams['sigma'] are floats
-	 * @param float $resolution
-	 * @return boolean $success
+	 * @param bool $convertColorspaceToRGB
+	 * @param bool $keepAspectRatio
+	 * @param bool $addBorder adds border. only effective if $keepAspectRatio is true, if array it is assumed to contain rgb values of the border
+	 * @param array $imageSharpenParams  $imageSharpenParams['radius'], $imageSharpenParams['sigma'] are floats
+	 * @param int $resolution
+	 *
+	 * @return bool
 	 */
 	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72)
 	{
@@ -57,7 +83,20 @@ class Processor
 	 * @param string $destination
 	 * @param string $size resizes to whichever is larger, width or height
 	 * @param string $format format jpeg|png
+	 *
 	 * @return boolean
+	 */
+
+	/**
+	 * get a thumbnail image for any media type
+	 *
+	 * @param string $filename
+	 * @param string $destination
+	 * @param integer $size resizes to whichever is larger, width or height
+	 * @param string $format
+	 * @param bool $convertColorspaceToRGB
+	 *
+	 * @return bool
 	 */
 	public static function makeThumb($filename, $destination, $size, $format, $convertColorspaceToRGB = true)
 	{
@@ -68,14 +107,15 @@ class Processor
 			return self::resizeImg($img, $destination, $size, $height = 0, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72);
 		} else {
 			$img->resizeImage(0, $size, \Imagick::FILTER_LANCZOS, 1);
-
 			return self::resizeImg($img, $destination, $width = 0, $size, $quality = '100', $format, $convertColorspaceToRGB, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72);
 		}
 	}
 
 	/**
 	 * read image or get a image representation of doc
-	 * @param $filename
+	 *
+	 * @param string $filename
+	 *
 	 * @return \Imagick
 	 */
 	private static function readImage($filename) {
@@ -110,6 +150,8 @@ class Processor
 	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
 		//does not work for the moment
+		// still not?! - jan 2013-11-06
+
 		$img->setResolution($resolution, $resolution);
 
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
@@ -133,9 +175,6 @@ class Processor
 			}
 		}
 
-
-
-
 		if ($format == Processor::FORMAT_JPEG) {
 			// set jpeg format
 			$img->setImageFormat($format);
@@ -155,15 +194,16 @@ class Processor
 			$img->sharpenImage($imageSharpenParams['radius'], $imageSharpenParams['sigma']);
 		}
 
-
-
-		// Strip out unneeded meta data
+		// strip out unneeded meta data
 		$img->stripImage();
-		// Writes resultant image to output directory
+
+		// writes resultant image to output directory
 		$success = $img->writeImage($destination);
-		// Destroys Imagick object, freeing allocated resources in the process
+
+		// destroys Imagick object, freeing allocated resources in the process
 		$img->clear();
 		$img->destroy();
+
 		return $success;
 	}
 
