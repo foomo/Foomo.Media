@@ -29,18 +29,18 @@ use Foomo\Media\Image\ImageSpec;
 class BreakPoint extends AbstractRule
 {
 	public $width;
-	public $size;
-	public static function create($width, $size)
+	public $screenWidth;
+	public static function create($width, $screenWidth)
 	{
 		$ret = new self;
 		$ret->width = $width;
-		$ret->size = $size;
+		$ret->screenWidth = $screenWidth;
 		return $ret;
 	}
 	public function process(ClientInfo $info, ImageSpec $spec)
 	{
-		if($info->screenWidth >= $this->width) {
-			$spec->width = $this->size;
+		if($info->screenWidth >= $this->screenWidth) {
+			$spec->width = $this->width;
 		}
 	}
 }

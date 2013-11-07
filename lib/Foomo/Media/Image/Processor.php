@@ -18,7 +18,7 @@
  */
 
 namespace Foomo\Media\Image;
-use Foomo\Media\Image\Adaptive\Rules;
+use Foomo\Media\Image\Adaptive\RuleSet;
 
 /**
  * @link www.foomo.org

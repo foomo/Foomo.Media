@@ -27,7 +27,7 @@ use Foomo\Media\Image\ImageSpec;
  * @license www.gnu.org/licenses/lgpl.txt
  * @author bostjan <bostjan.marusic@bestbytes.de>
  */
-class Rules
+class RuleSet
 {
 	public $rules = array();
 
@@ -55,13 +55,13 @@ class Rules
 
 	/**
 	 * @param $width
-	 * @param $size
+	 * @param $screenWidth
 	 *
 	 * @return $this
 	 */
-	public function breakAtWidthToSize($width, $size)
+	public function scaleToWidthAtScreenWidth($width, $screenWidth)
 	{
-		return $this->addRule(Rules\BreakPoint::create($width, $size));
+		return $this->addRule(Rules\BreakPoint::create($width, $screenWidth));
 	}
 
 	/**

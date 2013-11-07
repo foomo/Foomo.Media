@@ -19,7 +19,7 @@
 
 namespace Foomo\Media\Image;
 use Foomo\Media\Image\Adaptive\ClientInfo;
-use Foomo\Media\Image\Adaptive\Rules;
+use Foomo\Media\Image\Adaptive\RuleSet;
 
 /**
  * @link www.foomo.org
@@ -32,10 +32,10 @@ class Adaptive
 
 	/**
 	 * @param string $filename
-	 * @param Rules $rules
+	 * @param RuleSet $rules
 	 * @return ImageSpec
 	 */
-	public static function getImageSpec($filename, Rules $rules)
+	public static function getImageSpec($filename, RuleSet $rules)
 	{
 		return $rules->getSpec(
 			$filename,
