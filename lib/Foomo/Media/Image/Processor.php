@@ -40,7 +40,6 @@ class Processor
 	 */
 	public static function resizeImageWithSpec($spec, $destination)
 	{
-		//var_dump($spec);exit;
 		return self::resizeImage(
 			$spec->filename,
 			$destination,

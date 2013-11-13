@@ -26,12 +26,6 @@ namespace Foomo\Media\Image;
  */
 class ImageSpec
 {
-	public static function create($filename)
-	{
-		$ret = new self;
-		$ret->filename = $filename;
-		return $ret;
-	}
 	public $filename;
 	public $width = 0;
 	public $height = 0;
@@ -42,6 +36,12 @@ class ImageSpec
 	public $addBorder = false;
 	public $imageSharpenParams = array();
 	public $resolution = 72;
+	public static function create($filename)
+	{
+		$ret = new self;
+		$ret->filename = $filename;
+		return $ret;
+	}
 	/**
 	 * @return string
 	 */
