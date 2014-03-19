@@ -32,6 +32,28 @@ class Processor
 	const FORMAT_PNG = 'PNG';
 	const FORMAT_TIFF = 'TIFF';
 
+
+	/**
+	 * @param string $filename
+	 * @param string $x
+	 * @param integer $y
+	 * @param integer $width
+	 * @param integer $height
+	 * @param string $destination
+	 * @return bool success
+	 */
+	public static function cropImage($filename, $x, $y, $width, $height, $destination) {
+		$img = self::readImage($filename);
+		$success = $img->cropImage($width, $height ,$x ,$y);
+		if (!$success) {
+			return false;
+		}
+		// writes resultant image to output directory
+		$success = $img->writeImage($destination);
+
+		return $success;
+	}
+
 	/**
 	 * @param ImageSpec $spec
 	 * @param string $destination
@@ -51,7 +73,8 @@ class Processor
 			$spec->keepAspectRatio,
 			$spec->addBorder,
 			array(),
-			$spec->resolution
+			$spec->resolution,
+			$spec->backgroundColor
 		);
 	}
 	/**
@@ -66,13 +89,15 @@ class Processor
 	 * @param bool $addBorder adds border. only effective if $keepAspectRatio is true, if array it is assumed to contain rgb values of the border
 	 * @param array $imageSharpenParams  $imageSharpenParams['radius'], $imageSharpenParams['sigma'] are floats
 	 * @param int $resolution
+	 * @param string $backgroundColor #rgb or null
 	 *
 	 * @return bool
 	 */
-	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72)
+	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72, $backgroundColor = null)
 	{
 		// create new Imagick object
-		$img = self::readImage($filename);
+
+		$img = self::readImage($filename, $backgroundColor);
 		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder, $imageSharpenParams, $resolution);
 	}
 
@@ -114,11 +139,16 @@ class Processor
 	 * read image or get a image representation of doc
 	 *
 	 * @param string $filename
+	 * @param string $backgroundColor #rgb  or null. if not null set color before loading
 	 *
 	 * @return \Imagick
 	 */
-	private static function readImage($filename) {
+	private static function readImage($filename, $backgroundColor = null) {
+
 		$img = new \Imagick();
+		if (!is_null($backgroundColor)) {
+			$img->setbackgroundcolor(new \ImagickPixel($backgroundColor));
+		}
 		$extension = $ext = pathinfo($filename, PATHINFO_EXTENSION);
 		if ($extension == 'pdf') {
 			$img->readImage($filename . '[0]');
@@ -129,6 +159,10 @@ class Processor
 		} else {
 			$img->readImage($filename);
 		}
+
+		//$img->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
+
+		$img = $img->flattenimages();
 		return $img;
 	}
 

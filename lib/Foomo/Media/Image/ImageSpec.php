@@ -36,6 +36,8 @@ class ImageSpec
 	public $addBorder = false;
 	public $imageSharpenParams = array();
 	public $resolution = 72;
+	public $backgroundColor = null;
+
 	public static function create($filename)
 	{
 		$ret = new self;
