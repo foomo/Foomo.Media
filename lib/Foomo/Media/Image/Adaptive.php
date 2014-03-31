@@ -67,6 +67,6 @@ class Adaptive
 	}
 	public static function getStreamingJSCookieSnippet()
 	{
-		return 'document.cookie=\'' . self::COOKIE_NAME . '=\' + screen.width + \'x\' + screen.height + \'@\' +(\'devicePixelRatio\' in window ?window.devicePixelRatio: \'1\') + \'; path=/\'';
+		return 'document.cookie=\'' . self::COOKIE_NAME . '=\' + screen.width + \'x\' + screen.height + \'@\' +(\'devicePixelRatio\' in window ?window.devicePixelRatio: \'1\') + \'; path=/\';';
 	}
 }
