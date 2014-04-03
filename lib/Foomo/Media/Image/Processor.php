@@ -32,6 +32,15 @@ class Processor
 	const FORMAT_PNG = 'PNG';
 	const FORMAT_TIFF = 'TIFF';
 
+	private static $allowResizeAboveSource = true;
+
+	/**
+	 * set resize condition
+	 * @param boolean $allow if false source size is max destination size
+	 */
+	public static function allowResizeAboveSource($allow) {
+		self::$allowResizeAboveSource = $allow;
+	}
 
 	/**
 	 * @param string $filename
@@ -182,11 +191,16 @@ class Processor
 
 	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
-		//does not work for the moment
-		// still not?! - jan 2013-11-06
+		if (self::$allowResizeAboveSource == false) {
+			if ($width > $img->getImageWidth()) {
+				$width = $img->getImageWidth();
+			}
+			if ($height > $img->getImageHeight()) {
+				$height =  $img->getImageHeight();
+			}
+		}
 
 		$img->setResolution($resolution, $resolution);
-
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
 
 		if ($addBorder === true || is_array($addBorder)) {

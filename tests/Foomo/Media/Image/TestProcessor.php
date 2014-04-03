@@ -44,6 +44,27 @@ class TestProcessor extends \PHPUnit_Framework_TestCase
 		unlink($destinationFile);
 	}
 
+	public function testImageResizeLimited()
+	{
+		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
+		$destinationFile = \Foomo\Config::getTempDir(\Foomo\Media\Module::NAME) . DIRECTORY_SEPARATOR . 'outputImage.jpg';
+
+		\Foomo\Media\Image\Processor::allowResizeAboveSource(false);
+		$success = \Foomo\Media\Image\Processor::resizeImage($sourceFile, $destinationFile, $width = 1000, $height = 1000, $quality = 100, $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false,false,false);
+
+		$this->assertTrue($success);
+		$this->assertTrue(file_exists($destinationFile), 'destination file does not exist');
+
+		$img = new \Imagick();
+		$img->readImage($destinationFile);
+
+
+		$this->assertEquals(375, $img->getimagewidth());
+		$this->assertEquals(525, $img->getimageheight());
+
+		unlink($destinationFile);
+	}
+
 	public function testConvertFormat()
 	{
 		$sourceFile = __DIR__ . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'rgb.jpeg';
