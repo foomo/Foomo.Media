@@ -28,13 +28,35 @@ use Foomo\Media\Image\ImageSpec;
  */
 class HiDPI extends AbstractRule
 {
-	public static function create()
+	protected $allowedPixelRatios;
+
+	/**
+	 * @param float[] $allowedPixelRatios what pixel ratios to clamp to, because there are too many android devices
+	 *
+	 * @return HiDPI
+	 */
+	public static function create(array $allowedPixelRatios = array(1.0, 2.0))
 	{
-		return new self;
+		$ret = new self;
+		$ret->allowedPixelRatios = $allowedPixelRatios;
+		return $ret;
 	}
 	public function process(ClientInfo $info, ImageSpec $spec)
 	{
-		$spec->width *= $info->pixelRatio;
-		$spec->height *= $info->pixelRatio;
+		$pixelRatio = self::clampPixelRatio($info->pixelRatio, $this->allowedPixelRatios);
+		$spec->width *= $pixelRatio;
+		$spec->height *= $pixelRatio;
+	}
+	protected static function clampPixelRatio($pixelRatio, array $allowedPixelRatios)
+	{
+		$distance = 999999; // max
+		$ratio = 1.0;
+		foreach($allowedPixelRatios as $allowedPixelRatio) {
+			$currentDistance = abs($allowedPixelRatio - $pixelRatio);
+			if($currentDistance < $distance) {
+				$ratio = $allowedPixelRatio;
+			}
+		}
+		return $ratio;
 	}
 }

@@ -46,11 +46,13 @@ class RuleSet
 		return $this;
 	}
 	/**
+	 * @param float[] $allowedPixelRatios which pixel ratios are we clamping to
+	 *
 	 * @return $this
 	 */
-	public function hiDPI()
+	public function hiDPI(array $allowedPixelRatios = array(1.0, 2.0))
 	{
-		return $this->addRule(HiDPI::create());
+		return $this->addRule(HiDPI::create($allowedPixelRatios));
 	}
 
 	/**
