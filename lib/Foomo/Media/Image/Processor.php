@@ -105,7 +105,6 @@ class Processor
 	public static function resizeImage($filename, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution = 72, $backgroundColor = null)
 	{
 		// create new Imagick object
-
 		$img = self::readImage($filename, $backgroundColor);
 		return self::resizeImg($img, $destination, $width, $height, $quality, $format, $convertColorspaceToRGB, $keepAspectRatio, $addBorder, $imageSharpenParams, $resolution);
 	}
@@ -155,9 +154,7 @@ class Processor
 	private static function readImage($filename, $backgroundColor = null) {
 
 		$img = new \Imagick();
-		if(is_null($backgroundColor)) {
-			$img->setBackgroundColor(new \ImagickPixel('transparent'));
-		} else {
+		if(!is_null($backgroundColor)) {
 			$img->setbackgroundcolor(new \ImagickPixel($backgroundColor));
 		}
 		$extension = $ext = pathinfo($filename, PATHINFO_EXTENSION);
