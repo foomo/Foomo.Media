@@ -155,7 +155,9 @@ class Processor
 	private static function readImage($filename, $backgroundColor = null) {
 
 		$img = new \Imagick();
-		if (!is_null($backgroundColor)) {
+		if(is_null($backgroundColor)) {
+			$img->setBackgroundColor(new \ImagickPixel('transparent'));
+		} else {
 			$img->setbackgroundcolor(new \ImagickPixel($backgroundColor));
 		}
 		$extension = $ext = pathinfo($filename, PATHINFO_EXTENSION);
