@@ -49,10 +49,11 @@ class Processor
 	 * @param integer $width
 	 * @param integer $height
 	 * @param string $destination
+	 * @param string $backgroundColor
 	 * @return bool success
 	 */
-	public static function cropImage($filename, $x, $y, $width, $height, $destination) {
-		$img = self::readImage($filename);
+	public static function cropImage($filename, $x, $y, $width, $height, $destination, $backgroundColor = null) {
+		$img = self::readImage($filename, $backgroundColor);
 		$success = $img->cropImage($width, $height ,$x ,$y);
 		if (!$success) {
 			return false;
@@ -233,7 +234,7 @@ class Processor
 		}
 
 		if ($convertColorspaceToRGB === true) {
-			//	self::convertColorSpaceCYMKtoRGB($img);
+//			self::convertColorSpaceCYMKtoRGB($img);
 		}
 
 		if (isset($imageSharpenParams['radius']) && isset($imageSharpenParams['sigma'])) {
