@@ -53,9 +53,9 @@ class Adaptive
 			if(count($parts) == 2) {
 				$screenSizeParts = explode('x', $parts[0]);
 				if(count($screenSizeParts) == 2) {
-					$ret->pixelRatio = $parts[1];
-					$ret->screenWidth = $screenSizeParts[0];
-					$ret->screenHeight = $screenSizeParts[1];
+					$ret->pixelRatio = (float) $parts[1];
+					$ret->screenWidth = (int) $screenSizeParts[0];
+					$ret->screenHeight = (int) $screenSizeParts[1];
 					$valid = true;
 				}
 			}

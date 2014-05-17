@@ -49,11 +49,12 @@ class HiDPI extends AbstractRule
 	}
 	protected static function clampPixelRatio($pixelRatio, array $allowedPixelRatios)
 	{
-		$distance = 999999; // max
+		$distance = 999999; // max - boy would i like that screen computer combo :>
 		$ratio = 1.0;
 		foreach($allowedPixelRatios as $allowedPixelRatio) {
 			$currentDistance = abs($allowedPixelRatio - $pixelRatio);
 			if($currentDistance < $distance) {
+				$distance = $currentDistance;
 				$ratio = $allowedPixelRatio;
 			}
 		}
