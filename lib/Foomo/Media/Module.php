@@ -19,6 +19,8 @@
 
 namespace Foomo\Media;
 
+use Foomo\Media\Image\Server\DomainConfig;
+
 /**
  * @link www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
@@ -30,12 +32,8 @@ class Module extends \Foomo\Modules\ModuleBase
 	// ~ Constants
 	//---------------------------------------------------------------------------------------------
 
-	const VERSION = '0.2.0';
-	/**
-	 * the name of this module
-	 *
-	 */
 	const NAME = 'Foomo.Media';
+	const VERSION = '0.3.0';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -46,7 +44,6 @@ class Module extends \Foomo\Modules\ModuleBase
 	 */
 	public static function initializeModule()
 	{
-		
 	}
 
 	/**
@@ -56,7 +53,10 @@ class Module extends \Foomo\Modules\ModuleBase
 	 */
 	public static function getDescription()
 	{
-		return 'handles a variety of media types by interfacing with imagemagick, ffmpeg and the like';
+		return '
+			Handles a variety of media types by interfacing with imagemagick, ffmpeg and the like.
+			Using the Image Server can easily serve preconfigured sizes.
+		';
 	}
 
 	/**
@@ -68,12 +68,27 @@ class Module extends \Foomo\Modules\ModuleBase
 	{
 		return array(
 			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.*'),
+			# php modules
 			\Foomo\Modules\Resource\PhpModule::getResource('imagick'),
+			# cli commands
 			\Foomo\Modules\Resource\CliCommand::getResource('gs'),
 			\Foomo\Modules\Resource\CliCommand::getResource('convert'),
 			\Foomo\Modules\Resource\CliCommand::getResource('ffmpeg'),
-			\Foomo\Modules\Resource\CliCommand::getResource('pdfinfo')
+			\Foomo\Modules\Resource\CliCommand::getResource('pdfinfo'),
+			# domain configs
+			\Foomo\Modules\Resource\Config::getResource(self::NAME, 'Foomo.Media.Image.server'),
 		);
 	}
 
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @return \Foomo\Media\Image\Server\DomainConfig
+	 */
+	public static function getImageServerConfig()
+	{
+		return self::getConfig(DomainConfig::NAME);
+	}
 }
