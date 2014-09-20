@@ -90,7 +90,9 @@ class DomainConfig extends AbstractConfig
 	public $rules = array(
 		array(
 			'class'  => 'Foomo\\Media\\Image\\Adaptive\\Rules\\HiDPI',
-			'params' => array('1.0', '2.0')
+			'params' => array(
+				array('1.0', '2.0')
+			)
 		)
 	);
 
@@ -131,6 +133,6 @@ class DomainConfig extends AbstractConfig
 				return;
 			}
 		}
-		trigger_error('Could not find type "' . $type . '" layout "' . $layout . '" type', E_USER_ERROR);
+		trigger_error('Could not find layout type "' . $type . '" in "' . var_export($layout, true) . '" type', E_USER_ERROR);
 	}
 }
