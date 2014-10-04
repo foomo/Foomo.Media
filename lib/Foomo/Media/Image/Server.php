@@ -48,7 +48,11 @@ class Server
 			$ruleSet = $config->getRuleSet();
 		}
 
-		$config->applyLayoutToRuleSet($ruleSet, $layout, $type);
+		try {
+			$config->applyLayoutToRuleSet($ruleSet, $layout, $type);
+		} catch (\Exception $exception) {
+			self::serveError(404, $exception->getMessage());
+		}
 
 		$spec = Adaptive::getImageSpec($file, $ruleSet);
 		$hash = $spec->getHash();
@@ -58,9 +62,8 @@ class Server
 		// @todo locking anyone ?
 
 		if (!file_exists($cacheFilename) || filemtime($cacheFilename) < filemtime($file)) {
-			$success = Processor::resizeImageWithSpec($spec, $cacheFilename);
-			if (!$success) {
-				trigger_error('so wtf could I not resize that image ' . $file . ' with ' . var_export($spec, true), E_USER_ERROR);
+			if (!Processor::resizeImageWithSpec($spec, $cacheFilename)) {
+				self::serveError(500, "Could not serve image!");
 			}
 		}
 
@@ -89,6 +92,17 @@ class Server
 	// --------------------------------------------------------------------------------------------
 	// ~ Private static methods
 	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @param int $code
+	 * @param string $message
+	 */
+	private static function serveError($code, $message)
+	{
+		http_response_code($code);
+		echo $message;
+		exit;
+	}
 
 	/**
 	 * @param string $hash

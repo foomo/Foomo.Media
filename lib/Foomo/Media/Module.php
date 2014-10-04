@@ -33,7 +33,7 @@ class Module extends \Foomo\Modules\ModuleBase
 	//---------------------------------------------------------------------------------------------
 
 	const NAME = 'Foomo.Media';
-	const VERSION = '0.3.1';
+	const VERSION = '0.3.2';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods

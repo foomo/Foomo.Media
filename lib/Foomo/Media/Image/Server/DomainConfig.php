@@ -116,11 +116,13 @@ class DomainConfig extends AbstractConfig
 	 * @param RuleSet $ruleSet
 	 * @param string  $layout
 	 * @param string  $type
+	 * @throws \Exception
 	 */
 	public function applyLayoutToRuleSet(RuleSet $ruleSet, $layout, $type)
 	{
 		if (!isset($this->layouts[$layout])) {
 			trigger_error("Unknown layout $layout", E_USER_ERROR);
+			throw new \Exception("File layout  not found");
 		}
 
 		$layout = $this->layouts[$layout];
@@ -133,6 +135,7 @@ class DomainConfig extends AbstractConfig
 				return;
 			}
 		}
-		trigger_error('Could not find layout type "' . $type . '" in "' . var_export($layout, true) . '" type', E_USER_ERROR);
+
+		throw new \Exception("File layout type not found!");
 	}
 }
