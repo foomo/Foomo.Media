@@ -99,8 +99,13 @@ class Server
 	 */
 	private static function serveError($code, $message)
 	{
+		trigger_error($code . ': ' . $message, E_USER_WARNING);
 		http_response_code($code);
-		echo $message;
+		Utils::streamFile(
+			Module::getHtdocsDir('images') . '/error.svg',
+			$message,
+			'image/svg+xml'
+		);
 		exit;
 	}
 

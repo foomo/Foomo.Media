@@ -22,9 +22,9 @@ namespace Foomo\Media;
 use Foomo\Media\Image\Server\DomainConfig;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
- * @author bostjan <bostjan.marusic@bestbytes.de>
+ * @author  bostjan <bostjan.marusic@bestbytes.de>
  */
 class Module extends \Foomo\Modules\ModuleBase
 {
@@ -32,8 +32,8 @@ class Module extends \Foomo\Modules\ModuleBase
 	// ~ Constants
 	//---------------------------------------------------------------------------------------------
 
-	const NAME = 'Foomo.Media';
-	const VERSION = '0.3.2';
+	const NAME    = 'Foomo.Media';
+	const VERSION = '0.3.3';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
