@@ -76,7 +76,7 @@ class DomainConfig extends AbstractConfig
 	 */
 	public $layouts = array(
 		'my-app' => array(
-			0 => array(
+			array(
 				'foo' => 'screen',
 				'bar' => 'medium'
 			)
@@ -121,21 +121,24 @@ class DomainConfig extends AbstractConfig
 	public function applyLayoutToRuleSet(RuleSet $ruleSet, $layout, $type)
 	{
 		if (!isset($this->layouts[$layout])) {
-			trigger_error("Unknown layout $layout", E_USER_ERROR);
-			throw new \Exception("File layout  not found");
+			//trigger_error("Unknown layout $layout", E_USER_ERROR);
+			throw new \Exception("File layout '$layout' not found");
 		}
 
+		$found = false;
 		$layout = $this->layouts[$layout];
-		foreach (array_keys($this->grid) as $breakpoint) {
-			if (isset($layout[$breakpoint]) && isset($layout[$breakpoint][$type])) {
+		foreach (array_keys($this->grid) as $key => $breakpoint) {
+			if (isset($layout[$type]) && isset($this->grid[$breakpoint][$layout[$type]])) {
 				$ruleSet->scaleToWidthAtScreenWidth(
-					$this->grid[$breakpoint][$layout[$breakpoint][$type]],
+					$this->grid[$breakpoint][$layout[$type]],
 					$breakpoint
 				);
-				return;
+				$found = true;
 			}
 		}
 
-		throw new \Exception("File layout type not found!");
+		if (!$found) {
+			throw new \Exception("File layout '$type' not found!");
+		}
 	}
 }
