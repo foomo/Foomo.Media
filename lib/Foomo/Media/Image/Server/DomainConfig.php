@@ -126,11 +126,11 @@ class DomainConfig extends AbstractConfig
 		}
 
 		$found = false;
-		$layout = $this->layouts[$layout];
+		$layoutType = $this->layouts[$layout];
 		foreach (array_keys($this->grid) as $key => $breakpoint) {
-			if (isset($layout[$type]) && isset($this->grid[$breakpoint][$layout[$type]])) {
+			if (isset($layoutType[$type]) && isset($this->grid[$breakpoint][$layoutType[$type]])) {
 				$ruleSet->scaleToWidthAtScreenWidth(
-					$this->grid[$breakpoint][$layout[$type]],
+					$this->grid[$breakpoint][$layoutType[$type]],
 					$breakpoint
 				);
 				$found = true;
@@ -138,7 +138,7 @@ class DomainConfig extends AbstractConfig
 		}
 
 		if (!$found) {
-			throw new \Exception("File layout '$type' not found!");
+			throw new \Exception("File type '$type' not found in layout '$layout'!");
 		}
 	}
 }
