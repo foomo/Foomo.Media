@@ -22,7 +22,6 @@ namespace Foomo\Media\Image;
 use Foomo\Http\BrowserCache;
 use Foomo\Media\Image\Adaptive\RuleSet;
 use Foomo\Media\Module;
-use Foomo\Utils;
 
 /**
  * @link    www.foomo.org
@@ -85,7 +84,7 @@ class Server
 			BrowserCache::sendNotModified();
 		} else {
 			BrowserCache::sendHeaders();
-			Utils::streamFile($cacheFilename, null, $mime);
+			\Foomo\Utils::streamFile($cacheFilename, null, $mime);
 		}
 	}
 
@@ -102,7 +101,7 @@ class Server
 		trigger_error($code . ': ' . $message, E_USER_WARNING);
 		http_response_code($code);
 		Utils::streamFile(
-			Module::getHtdocsDir('images') . '/error.svg',
+			\Foomo\Module::getHtdocsDir('images') . '/error.svg',
 			$message,
 			'image/svg+xml'
 		);
