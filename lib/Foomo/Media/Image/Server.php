@@ -100,8 +100,8 @@ class Server
 	{
 		trigger_error($code . ': ' . $message, E_USER_WARNING);
 		http_response_code($code);
-		Utils::streamFile(
-			\Foomo\Module::getHtdocsDir('images') . '/error.svg',
+		\Foomo\Utils::streamFile(
+			Module::getHtdocsDir('images') . '/error.svg',
 			$message,
 			'image/svg+xml'
 		);
