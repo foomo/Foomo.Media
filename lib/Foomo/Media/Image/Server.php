@@ -78,13 +78,14 @@ class Server
 				$mime = 'image/png';
 				break;
 		}
-
 		BrowserCache::setResourceData($mime, $hash, filemtime($file), 7 * 24 * 3600);
 		if (BrowserCache::tryBrowserCache()) {
 			BrowserCache::sendNotModified();
 		} else {
 			BrowserCache::sendHeaders();
-			\Foomo\Utils::streamFile($cacheFilename, null, $mime);
+			if($_SERVER['REQUEST_METHOD'] == 'GET') {
+				\Foomo\Utils::streamFile($cacheFilename, null, $mime);
+			}
 		}
 	}
 
