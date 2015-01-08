@@ -29,6 +29,7 @@ use Foomo\Media\Module;
  */
 class Server
 {
+	const DEFAULT_EXPIRATION_TIME = 86400;
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
@@ -37,16 +38,17 @@ class Server
 	 * @param string  $file
 	 * @param string  $layout
 	 * @param string  $type
+	 * @param \Foomo\Media\Image\Adaptive\RuleSet $ruleSet
+	 * @param int $expirationTime
+	 *
 	 * @param RuleSet $ruleSet
 	 */
-	public static function serve($file, $layout, $type, $ruleSet = null)
+	public static function serve($file, $layout, $type, RuleSet $ruleSet = null, $expirationTime = self::DEFAULT_EXPIRATION_TIME)
 	{
 		$config = Module::getImageServerConfig();
-
 		if (is_null($ruleSet)) {
 			$ruleSet = $config->getRuleSet();
 		}
-
 		try {
 			$config->applyLayoutToRuleSet($ruleSet, $layout, $type);
 		} catch (\Exception $exception) {
@@ -78,13 +80,17 @@ class Server
 				$mime = 'image/png';
 				break;
 		}
-		BrowserCache::setResourceData($mime, $hash, filemtime($file), 7 * 24 * 3600);
+		BrowserCache::setResourceData($mime, $hash, filemtime($file), $expirationTime);
 		if (BrowserCache::tryBrowserCache()) {
 			BrowserCache::sendNotModified();
 		} else {
 			BrowserCache::sendHeaders();
-			if($_SERVER['REQUEST_METHOD'] == 'GET') {
-				\Foomo\Utils::streamFile($cacheFilename, null, $mime);
+			switch($_SERVER['REQUEST_METHOD']) {
+				case 'GET':
+					\Foomo\Utils::streamFile($cacheFilename, null, $mime);
+					break;
+				case 'HEAD':
+					header('Content-Type: ' . $mime);
 			}
 		}
 	}

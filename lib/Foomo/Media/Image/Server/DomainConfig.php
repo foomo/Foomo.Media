@@ -76,9 +76,21 @@ class DomainConfig extends AbstractConfig
 	 */
 	public $layouts = array(
 		'my-app' => array(
-			array(
+			0 => array(
 				'foo' => 'screen',
 				'bar' => 'medium'
+			),
+			768 => array(
+				'foo' => 'full',
+				'bar' => 'small'
+			),
+			992 => array(
+				'foo' => 'screen',
+				'bar' => 'medium'
+			),
+			1200 => array(
+				'foo' => 'screen',
+				'bar' => 'full'
 			)
 		)
 	);
@@ -121,22 +133,24 @@ class DomainConfig extends AbstractConfig
 	public function applyLayoutToRuleSet(RuleSet $ruleSet, $layout, $type)
 	{
 		if (!isset($this->layouts[$layout])) {
-			//trigger_error("Unknown layout $layout", E_USER_ERROR);
 			throw new \Exception("File layout '$layout' not found");
 		}
-
 		$found = false;
 		$layoutType = $this->layouts[$layout];
+		$layoutRules = array();
 		foreach (array_keys($this->grid) as $key => $breakpoint) {
-			if (isset($layoutType[$type]) && isset($this->grid[$breakpoint][$layoutType[$type]])) {
-				$ruleSet->scaleToWidthAtScreenWidth(
-					$this->grid[$breakpoint][$layoutType[$type]],
+			//var_dump($breakpoint, $layout, $type, $layoutType, $layoutType[$breakpoint][$type]);exit;
+			if (isset($layoutType[$breakpoint]) && isset($layoutType[$breakpoint][$type])  && isset($this->grid[$breakpoint][$layoutType[$breakpoint][$type]])) {
+				$layoutRules[] = \Foomo\Media\Image\Adaptive\Rules\BreakPoint::create(
+					$this->grid[$breakpoint][$layoutType[$breakpoint][$type]],
 					$breakpoint
 				);
 				$found = true;
 			}
 		}
-
+		if(!empty($layoutRules)) {
+			$ruleSet->rules = array_merge($layoutRules, $ruleSet->rules);
+		}
 		if (!$found) {
 			throw new \Exception("File type '$type' not found in layout '$layout'!");
 		}
