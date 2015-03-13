@@ -190,27 +190,41 @@ class Processor
 	}
 
     /**
+     * @param $img
+     * @return mixed
+     */
+    private static function setDefaultIccProfile($img)
+    {
+        $pFile = __DIR__ . '/srgb.icc';
+        $icc = file_get_contents($pFile);
+        $img->profileImage('icc', $icc);
+        $img->setImageColorSpace(\Imagick::COLORSPACE_SRGB);
+        return $img;
+    }
+
+    /**
      * Strips default profiles out and apply its own ICC if present or a generic sRGB profile if none
      * @param \Imagick $img
      * @return mixed
      */
     private static function normalizeSRGBProfile($img)
     {
-        // Get image profile
-        $profile = $img->getImageProfile('icc');
+        try {
+            // Get image profile
+            $profile = $img->getImageProfile('icc');
 
-        // strip out unneeded meta data
-        $img->stripImage();
+            // strip out unneeded meta data
+            $img->stripImage();
 
-        if(!empty($profile)) {
-            $img->profileImage('icc', $profile);
-        } else {
-            $pFile = __DIR__ . '/srgb.icc';
-            $icc = file_get_contents($pFile);
-            $img->profileImage('icc', $icc);
-            $img->setImageColorSpace(\Imagick::COLORSPACE_SRGB);
+            if(!empty($profile)) {
+                $img->profileImage('icc', $profile);
+            } else {
+                $img = self::setDefaultIccProfile($img);
+            }
+
+        } catch(\Exception $e) {
+            $img = self::setDefaultIccProfile($img);
         }
-
         return $img;
     }
 
