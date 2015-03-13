@@ -169,7 +169,7 @@ class Processor
 			$img->readImage($filename);
 		}
 
-		//$img->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
+		// $img->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
 
 		$img = $img->flattenimages();
 		return $img;
@@ -185,9 +185,34 @@ class Processor
 			$icc_rgb = file_get_contents($pFile);
 			$img->profileImage('icc', $icc_rgb);
 			$img->setImageColorSpace(\Imagick::COLORSPACE_RGB);
-		}
+        }
 		return $img;
 	}
+
+    /**
+     * Strips default profiles out and apply its own ICC if present or a generic sRGB profile if none
+     * @param \Imagick $img
+     * @return mixed
+     */
+    private static function normalizeSRGBProfile($img)
+    {
+        // Get image profile
+        $profile = $img->getImageProfile('icc');
+
+        // strip out unneeded meta data
+        $img->stripImage();
+
+        if(!empty($profile)) {
+            $img->profileImage('icc', $profile);
+        } else {
+            $pFile = __DIR__ . '/srgb.icc';
+            $icc = file_get_contents($pFile);
+            $img->profileImage('icc', $icc);
+            $img->setImageColorSpace(\Imagick::COLORSPACE_SRGB);
+        }
+
+        return $img;
+    }
 
 	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
@@ -233,8 +258,11 @@ class Processor
 			$img->setImageFormat($format);
 		}
 
+        // Apply srgb.icc profile
+        self::normalizeSRGBProfile($img);
+
 		if ($convertColorspaceToRGB === true) {
-//			self::convertColorSpaceCYMKtoRGB($img);
+			self::convertColorSpaceCYMKtoRGB($img);
 		}
 
 		if (isset($imageSharpenParams['radius']) && isset($imageSharpenParams['sigma'])) {
@@ -242,7 +270,7 @@ class Processor
 		}
 
 		// strip out unneeded meta data
-		$img->stripImage();
+		// $img->stripImage();
 
 		// writes resultant image to output directory
 		$success = $img->writeImage($destination);
