@@ -32,7 +32,7 @@ class Processor
 	const FORMAT_PNG = 'PNG';
 	const FORMAT_TIFF = 'TIFF';
 
-	private static $allowResizeAboveSource = true;
+	protected static $allowResizeAboveSource = true;
 
 	/**
 	 * set resize condition
@@ -171,11 +171,11 @@ class Processor
 
 		// $img->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
 
-		$img = $img->flattenimages();
+		$img = $img->flattenImages();
 		return $img;
 	}
 
-	private static function convertColorSpaceCYMKtoRGB($img)
+	protected static function convertColorSpaceCYMKtoRGB($img)
 	{
 		if ($img->getImageColorspace() == \Imagick::COLORSPACE_CMYK) {
 			$pFile = __DIR__ . '/USWebUncoated.icc';
@@ -196,6 +196,7 @@ class Processor
     private static function setDefaultIccProfile($img)
     {
         $pFile = __DIR__ . '/srgb.icc';
+        //$pFile = __DIR__ . '/AdobeRGB1998.icc';
         $icc = file_get_contents($pFile);
         $img->profileImage('icc', $icc);
         $img->setImageColorSpace(\Imagick::COLORSPACE_SRGB);
@@ -207,7 +208,7 @@ class Processor
      * @param \Imagick $img
      * @return mixed
      */
-    private static function normalizeSRGBProfile($img)
+    protected static function normalizeSRGBProfile($img)
     {
         try {
             // Get image profile
@@ -228,6 +229,20 @@ class Processor
         return $img;
     }
 
+    /**
+     * @param \IMagick $img
+     * @param $destination
+     * @param $width
+     * @param $height
+     * @param string $quality
+     * @param string $format
+     * @param bool $convertColorspaceToRGB
+     * @param bool $keepAspectRatio
+     * @param bool $addBorder
+     * @param array $imageSharpenParams
+     * @param $resolution
+     * @return mixed
+     */
 	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
 		if (self::$allowResizeAboveSource == false) {
