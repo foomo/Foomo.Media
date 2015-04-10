@@ -190,43 +190,30 @@ class Processor
 	}
 
     /**
-     * @param $img
+     * @param \Imagick $img
+     * @param string $profileName
      * @return mixed
      */
-    private static function setDefaultIccProfile($img)
+    protected static function setDefaultIccProfile($img, $profileName = 'AdobeRGB1998')
     {
-        $pFile = __DIR__ . '/srgb.icc';
-        //$pFile = __DIR__ . '/AdobeRGB1998.icc';
+        //$pFile = __DIR__ . '/srgb.icc';
+        $pFile = __DIR__ . '/'.$profileName.'.icc';
         $icc = file_get_contents($pFile);
         $img->profileImage('icc', $icc);
         $img->setImageColorSpace(\Imagick::COLORSPACE_SRGB);
         return $img;
     }
 
-    /**
-     * Strips default profiles out and apply its own ICC if present or a generic sRGB profile if none
-     * @param \Imagick $img
-     * @return mixed
-     */
-    protected static function normalizeSRGBProfile($img)
+    protected static function checkIccIsAllowed($profile, $unallowed = [])
     {
-        try {
-            // Get image profile
-            $profile = $img->getImageProfile('icc');
-
-            // strip out unneeded meta data
-            $img->stripImage();
-
-            if(!empty($profile)) {
-                $img->profileImage('icc', $profile);
-            } else {
-                $img = self::setDefaultIccProfile($img);
+        if (!empty($unallowed)) {
+            foreach ($unallowed as $item) {
+                if (substr_count($profile, $item) > 0) {
+                    return false;
+                }
             }
-
-        } catch(\Exception $e) {
-            $img = self::setDefaultIccProfile($img);
         }
-        return $img;
+        return true;
     }
 
     /**
@@ -286,9 +273,6 @@ class Processor
 		} else {
 			$img->setImageFormat($format);
 		}
-
-        // Apply srgb.icc profile
-        self::normalizeSRGBProfile($img);
 
 		if ($convertColorspaceToRGB === true) {
 			self::convertColorSpaceCYMKtoRGB($img);
