@@ -34,6 +34,12 @@ class Processor
 
 	protected static $allowResizeAboveSource = true;
 
+    /**
+     * A flag for special img processing
+     * @var bool
+     */
+    protected static $specialProcessing = false;
+
 	/**
 	 * set resize condition
 	 * @param boolean $allow if false source size is max destination size
@@ -204,10 +210,49 @@ class Processor
         return $img;
     }
 
-    protected static function checkIccIsAllowed($profile, $unallowed = [])
+    /**
+     * Strips default profiles out and apply its own ICC if present or a generic sRGB profile if none
+     * @param $img
+     * @param string $profileName
+     * @param array $disallowed
+     * @return mixed
+     */
+    protected static function normalizeSRGBProfile($img, $profileName = 'AdobeRGB1998', $disallowed = [])
     {
-        if (!empty($unallowed)) {
-            foreach ($unallowed as $item) {
+        try {
+            // Get image profile
+            $profile = $img->getImageProfile('icc');
+
+            // strip out unneeded meta data
+            $img->stripImage();
+
+            $allowedIcc = self::checkIccIsAllowed($profile, $disallowed);
+
+            // if profile not empty
+            if(!empty($profile) && $allowedIcc) {
+                $img->profileImage('icc', $profile);
+            } else {
+                $img = self::setDefaultIccProfile($img, $profileName);
+                if(!$allowedIcc) {
+                    self::$specialProcessing = true;
+                }
+            }
+
+        } catch(\Exception $e) {
+            $img = self::setDefaultIccProfile($img, $profileName);
+        }
+        return $img;
+    }
+
+    /**
+     * @param $profile
+     * @param array $disallowed
+     * @return bool
+     */
+    protected static function checkIccIsAllowed($profile, $disallowed = [])
+    {
+        if (!empty($disallowed)) {
+            foreach ($disallowed as $item) {
                 if (substr_count($profile, $item) > 0) {
                     return false;
                 }
@@ -284,6 +329,8 @@ class Processor
 
 		// strip out unneeded meta data
 		// $img->stripImage();
+
+        self::normalizeSRGBProfile($img, 'AdobeRGB1998', ['sRGB']);
 
 		// writes resultant image to output directory
 		$success = $img->writeImage($destination);
