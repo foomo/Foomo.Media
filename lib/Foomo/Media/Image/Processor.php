@@ -38,7 +38,7 @@ class Processor
      * A flag for special img processing
      * @var bool
      */
-    protected static $specialProcessing = false;
+    public static $specialProcessing = false;
 
 	/**
 	 * set resize condition
