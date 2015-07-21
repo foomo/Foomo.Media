@@ -22,6 +22,8 @@ namespace Foomo\Media\Image;
 use Foomo\Http\BrowserCache;
 use Foomo\Media\Image\Adaptive\RuleSet;
 use Foomo\Media\Module;
+use Foomo\Utils;
+use Symfony\Component\Process\Process;
 
 /**
  * @link    www.foomo.org
@@ -60,6 +62,23 @@ class Server
 
 		$cacheFilename = self::getCacheFilename($hash);
 
+		switch (Utils::guessMime($file)) {
+			case 'image/png':
+				$spec->format = Processor::FORMAT_PNG;
+				// @fixme: resizing images with PNGs doesn't work so just copy it over for now
+				if (file_exists($file) && !file_exists($cacheFilename)) {
+					copy($file, $cacheFilename);
+				}
+				break;
+			case 'image/gif':
+				$spec->format = Processor::FORMAT_GIF;
+				// @fixme: resizing animated GIFs doesn't work so just copy it over for now
+				if (file_exists($file) && !file_exists($cacheFilename)) {
+					copy($file, $cacheFilename);
+				}
+				break;
+		}
+
 		// @todo locking anyone ?
 
 		if (!file_exists($cacheFilename) || filemtime($cacheFilename) < filemtime($file)) {
@@ -87,7 +106,7 @@ class Server
 			BrowserCache::sendHeaders();
 			switch($_SERVER['REQUEST_METHOD']) {
 				case 'GET':
-					\Foomo\Utils::streamFile($cacheFilename, null, $mime);
+					Utils::streamFile($cacheFilename, null, $mime);
 					break;
 				case 'HEAD':
 					header('Content-Type: ' . $mime);
@@ -107,7 +126,7 @@ class Server
 	{
 		trigger_error($code . ': ' . $message, E_USER_WARNING);
 		http_response_code($code);
-		\Foomo\Utils::streamFile(
+		Utils::streamFile(
 			Module::getHtdocsDir('images') . '/error.svg',
 			$message,
 			'image/svg+xml'
