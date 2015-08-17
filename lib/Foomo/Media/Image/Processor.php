@@ -35,12 +35,6 @@ class Processor
 	protected static $allowResizeAboveSource = true;
 
     /**
-     * A flag for special img processing
-     * @var bool
-     */
-    public static $specialProcessing = false;
-
-	/**
 	 * set resize condition
 	 * @param boolean $allow if false source size is max destination size
 	 */
@@ -210,39 +204,6 @@ class Processor
         return $img;
     }
 
-    /**
-     * Strips default profiles out and apply its own ICC if present or a generic sRGB profile if none
-     * @param $img
-     * @param string $profileName
-     * @param array $disallowed
-     * @return mixed
-     */
-    protected static function normalizeSRGBProfile($img, $profileName = 'AdobeRGB1998', $disallowed = [])
-    {
-        try {
-            // Get image profile
-            $profile = $img->getImageProfile('icc');
-
-            // strip out unneeded meta data
-            $img->stripImage();
-
-            $allowedIcc = self::checkIccIsAllowed($profile, $disallowed);
-
-            // if profile not empty
-            if(!empty($profile) && $allowedIcc) {
-                $img->profileImage('icc', $profile);
-            } else {
-                $img = self::setDefaultIccProfile($img, $profileName);
-                if(!$allowedIcc) {
-                    self::$specialProcessing = true;
-                }
-            }
-
-        } catch(\Exception $e) {
-            $img = self::setDefaultIccProfile($img, $profileName);
-        }
-        return $img;
-    }
 
     /**
      * @param $profile
@@ -327,10 +288,22 @@ class Processor
 			$img->sharpenImage($imageSharpenParams['radius'], $imageSharpenParams['sigma']);
 		}
 
-		// strip out unneeded meta data
-		// $img->stripImage();
+		try {
+			// strip out unneeded meta data
+			// Get image profile
+			$profile = $img->getImageProfile('icc');
+			// strip out unneeded meta data
+			$img->stripImage();
+			// if profile not empty
+			if (!empty($profile)) {
+				$img->profileImage('icc', $profile);
+			}
+		} catch (\Exception $e) {
+			//means there is no profile
+		}
 
-        self::normalizeSRGBProfile($img, 'AdobeRGB1998', ['sRGB']);
+
+
 
 		// writes resultant image to output directory
 		$success = $img->writeImage($destination);
