@@ -82,9 +82,15 @@ class Server
 		// @todo locking anyone ?
 
 		if (!file_exists($cacheFilename) || filemtime($cacheFilename) < filemtime($file)) {
+			$allowResizeAboveSourceSetting = Processor::getAllowResizeAboveSource();
+			if ($layout == 'neos') {
+				Processor::allowResizeAboveSource(false);
+			}
 			if (!Processor::resizeImageWithSpec($spec, $cacheFilename)) {
 				self::serveError(500, "Could not serve image!");
 			}
+			//set back to what it was - as we disabled it for neos
+			Processor::allowResizeAboveSource($allowResizeAboveSourceSetting);
 		}
 
 		$mime = 'octet/stream';

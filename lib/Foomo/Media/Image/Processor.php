@@ -18,7 +18,6 @@
  */
 
 namespace Foomo\Media\Image;
-use Foomo\Media\Image\Adaptive\RuleSet;
 
 /**
  * @link www.foomo.org
@@ -34,12 +33,21 @@ class Processor
 
 	protected static $allowResizeAboveSource = true;
 
-    /**
+	/**
 	 * set resize condition
 	 * @param boolean $allow if false source size is max destination size
 	 */
-	public static function allowResizeAboveSource($allow) {
+	public static function allowResizeAboveSource($allow)
+	{
 		self::$allowResizeAboveSource = $allow;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function getAllowResizeAboveSource()
+	{
+		return self::$allowResizeAboveSource;
 	}
 
 	/**
@@ -52,9 +60,10 @@ class Processor
 	 * @param string $backgroundColor
 	 * @return bool success
 	 */
-	public static function cropImage($filename, $x, $y, $width, $height, $destination, $backgroundColor = null) {
+	public static function cropImage($filename, $x, $y, $width, $height, $destination, $backgroundColor = null)
+	{
 		$img = self::readImage($filename, $backgroundColor);
-		$success = $img->cropImage($width, $height ,$x ,$y);
+		$success = $img->cropImage($width, $height, $x, $y);
 		if (!$success) {
 			return false;
 		}
@@ -87,6 +96,7 @@ class Processor
 			$spec->backgroundColor
 		);
 	}
+
 	/**
 	 * @param $filename
 	 * @param $destination
@@ -97,7 +107,7 @@ class Processor
 	 * @param bool $convertColorspaceToRGB
 	 * @param bool $keepAspectRatio
 	 * @param bool $addBorder adds border. only effective if $keepAspectRatio is true, if array it is assumed to contain rgb values of the border
-	 * @param array $imageSharpenParams  $imageSharpenParams['radius'], $imageSharpenParams['sigma'] are floats
+	 * @param array $imageSharpenParams $imageSharpenParams['radius'], $imageSharpenParams['sigma'] are floats
 	 * @param int $resolution
 	 * @param string $backgroundColor #rgb or null
 	 *
@@ -152,10 +162,11 @@ class Processor
 	 *
 	 * @return \Imagick
 	 */
-	private static function readImage($filename, $backgroundColor = null) {
+	private static function readImage($filename, $backgroundColor = null)
+	{
 
 		$img = new \Imagick();
-		if(!is_null($backgroundColor)) {
+		if (!is_null($backgroundColor)) {
 			$img->setbackgroundcolor(new \ImagickPixel($backgroundColor));
 		}
 		$extension = $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -185,57 +196,57 @@ class Processor
 			$icc_rgb = file_get_contents($pFile);
 			$img->profileImage('icc', $icc_rgb);
 			$img->setImageColorSpace(\Imagick::COLORSPACE_RGB);
-        }
+		}
 		return $img;
 	}
 
-    /**
-     * @param \Imagick $img
-     * @param string $profileName
-     * @return mixed
-     */
-    protected static function setDefaultIccProfile($img, $profileName = 'AdobeRGB1998')
-    {
-        //$pFile = __DIR__ . '/srgb.icc';
-        $pFile = __DIR__ . '/'.$profileName.'.icc';
-        $icc = file_get_contents($pFile);
-        $img->profileImage('icc', $icc);
-        $img->setImageColorSpace(\Imagick::COLORSPACE_SRGB);
-        return $img;
-    }
+	/**
+	 * @param \Imagick $img
+	 * @param string $profileName
+	 * @return mixed
+	 */
+	protected static function setDefaultIccProfile($img, $profileName = 'AdobeRGB1998')
+	{
+		//$pFile = __DIR__ . '/srgb.icc';
+		$pFile = __DIR__ . '/' . $profileName . '.icc';
+		$icc = file_get_contents($pFile);
+		$img->profileImage('icc', $icc);
+		$img->setImageColorSpace(\Imagick::COLORSPACE_SRGB);
+		return $img;
+	}
 
 
-    /**
-     * @param $profile
-     * @param array $disallowed
-     * @return bool
-     */
-    protected static function checkIccIsAllowed($profile, $disallowed = [])
-    {
-        if (!empty($disallowed)) {
-            foreach ($disallowed as $item) {
-                if (substr_count($profile, $item) > 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+	/**
+	 * @param $profile
+	 * @param array $disallowed
+	 * @return bool
+	 */
+	protected static function checkIccIsAllowed($profile, $disallowed = [])
+	{
+		if (!empty($disallowed)) {
+			foreach ($disallowed as $item) {
+				if (substr_count($profile, $item) > 0) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
-    /**
-     * @param \IMagick $img
-     * @param $destination
-     * @param $width
-     * @param $height
-     * @param string $quality
-     * @param string $format
-     * @param bool $convertColorspaceToRGB
-     * @param bool $keepAspectRatio
-     * @param bool $addBorder
-     * @param array $imageSharpenParams
-     * @param $resolution
-     * @return mixed
-     */
+	/**
+	 * @param \IMagick $img
+	 * @param $destination
+	 * @param $width
+	 * @param $height
+	 * @param string $quality
+	 * @param string $format
+	 * @param bool $convertColorspaceToRGB
+	 * @param bool $keepAspectRatio
+	 * @param bool $addBorder
+	 * @param array $imageSharpenParams
+	 * @param $resolution
+	 * @return mixed
+	 */
 	private static function resizeImg($img, $destination, $width, $height, $quality = '100', $format = Processor::FORMAT_JPEG, $convertColorspaceToRGB = false, $keepAspectRatio = false, $addBorder = false, $imageSharpenParams = array(), $resolution)
 	{
 		if (self::$allowResizeAboveSource == false) {
@@ -243,7 +254,7 @@ class Processor
 				$width = $img->getImageWidth();
 			}
 			if ($height > $img->getImageHeight()) {
-				$height =  $img->getImageHeight();
+				$height = $img->getImageHeight();
 			}
 		}
 
@@ -301,9 +312,6 @@ class Processor
 		} catch (\Exception $e) {
 			//means there is no profile
 		}
-
-
-
 
 		// writes resultant image to output directory
 		$success = $img->writeImage($destination);
