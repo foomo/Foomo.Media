@@ -84,6 +84,7 @@ class Server
 			if (!Processor::resizeImageWithSpec($spec, $cacheFilename)) {
 				self::serveError(500, "Could not serve image!");
 			}
+
 		}
 
 		$mime = 'octet/stream';
