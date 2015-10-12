@@ -22,7 +22,6 @@ namespace Foomo\Media\Image;
 use Foomo\Http\BrowserCache;
 use Foomo\Media\Image\Adaptive\RuleSet;
 use Foomo\Media\Module;
-use Foomo\Utils;
 
 /**
  * @link    www.foomo.org
@@ -61,7 +60,7 @@ class Server
 
 		$cacheFilename = self::getCacheFilename($hash);
 
-		switch (Utils::guessMime($file)) {
+		switch (\Foomo\Utils::guessMime($file)) {
 			case 'image/png':
 				$spec->format = Processor::FORMAT_PNG;
 				// @fixme: resizing images with PNGs doesn't work so just copy it over for now
@@ -106,7 +105,7 @@ class Server
 			BrowserCache::sendHeaders();
 			switch($_SERVER['REQUEST_METHOD']) {
 				case 'GET':
-					Utils::streamFile($cacheFilename, null, $mime);
+					\Foomo\Utils::streamFile($cacheFilename, null, $mime);
 					break;
 				case 'HEAD':
 					header('Content-Type: ' . $mime);
@@ -126,7 +125,7 @@ class Server
 	{
 		trigger_error($code . ': ' . $message, E_USER_WARNING);
 		http_response_code($code);
-		Utils::streamFile(
+		\Foomo\Utils::streamFile(
 			Module::getHtdocsDir('images') . '/error.svg',
 			$message,
 			'image/svg+xml'
