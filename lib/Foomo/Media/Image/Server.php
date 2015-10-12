@@ -23,7 +23,6 @@ use Foomo\Http\BrowserCache;
 use Foomo\Media\Image\Adaptive\RuleSet;
 use Foomo\Media\Module;
 use Foomo\Utils;
-use Symfony\Component\Process\Process;
 
 /**
  * @link    www.foomo.org
