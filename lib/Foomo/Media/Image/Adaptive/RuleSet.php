@@ -45,6 +45,16 @@ class RuleSet
 		$this->rules[] = $rule;
 		return $this;
 	}
+
+	/**
+	 * @param AbstractRule[] $rules
+	 * @return $this
+	 */
+	public function addRules(array $rules)
+	{
+		$this->rules = array_merge($this->rules, $rules);
+		return $this;
+	}
 	/**
 	 * @param float[] $allowedPixelRatios which pixel ratios are we clamping to
 	 *

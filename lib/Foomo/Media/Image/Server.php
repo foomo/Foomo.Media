@@ -55,31 +55,36 @@ class Server
 			self::serveError(404, $exception->getMessage());
 		}
 
-		$spec = Adaptive::getImageSpec($file, $ruleSet);
+		self::cacheAndServe(Adaptive::getImageSpec($file, $ruleSet), $expirationTime);
+	}
+
+	public static function cacheAndServe(ImageSpec $spec, $expirationTime = self::DEFAULT_EXPIRATION_TIME)
+	{
+
 		$hash = $spec->getHash();
 
 		$cacheFilename = self::getCacheFilename($hash);
 
-		switch (\Foomo\Utils::guessMime($file)) {
+		switch (\Foomo\Utils::guessMime($spec->filename)) {
 			case 'image/png':
 				$spec->format = Processor::FORMAT_PNG;
 				// @fixme: resizing images with PNGs doesn't work so just copy it over for now
-				if (file_exists($file) && !file_exists($cacheFilename)) {
-					copy($file, $cacheFilename);
+				if (file_exists($spec->filename) && !file_exists($cacheFilename)) {
+					copy($spec->filename, $cacheFilename);
 				}
 				break;
 			case 'image/gif':
 				$spec->format = Processor::FORMAT_GIF;
 				// @fixme: resizing animated GIFs doesn't work so just copy it over for now
-				if (file_exists($file) && !file_exists($cacheFilename)) {
-					copy($file, $cacheFilename);
+				if (file_exists($spec->filename) && !file_exists($cacheFilename)) {
+					copy($spec->filename, $cacheFilename);
 				}
 				break;
 		}
 
 		// @todo locking anyone ?
 
-		if (!file_exists($cacheFilename) || filemtime($cacheFilename) < filemtime($file)) {
+		if (!file_exists($cacheFilename) || filemtime($cacheFilename) < filemtime($spec->filename)) {
 			if (!Processor::resizeImageWithSpec($spec, $cacheFilename)) {
 				self::serveError(500, "Could not serve image!");
 			}
@@ -98,7 +103,7 @@ class Server
 				$mime = 'image/png';
 				break;
 		}
-		BrowserCache::setResourceData($mime, $hash, filemtime($file), $expirationTime);
+		BrowserCache::setResourceData($mime, $hash, filemtime($spec->filename), $expirationTime);
 		if (BrowserCache::tryBrowserCache()) {
 			BrowserCache::sendNotModified();
 		} else {
@@ -112,6 +117,7 @@ class Server
 			}
 		}
 	}
+
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Private static methods

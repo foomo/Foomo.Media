@@ -259,6 +259,17 @@ class Processor
 		}
 
 		$img->setResolution($resolution, $resolution);
+
+		if($keepAspectRatio) {
+			$originalWidth = $img->getImageWidth();
+			$originalHeight = $img->getImageHeight();
+			if(is_null($width)) {
+				$width = (int) $originalWidth * ($height / $originalHeight);
+			} else if(is_null($height)) {
+				$height = (int) $originalHeight * ($width / $originalWidth);
+			}
+		}
+
 		$img->resizeImage($width, $height, \Imagick::FILTER_LANCZOS, 1, $keepAspectRatio);
 
 		if ($addBorder === true || is_array($addBorder)) {
