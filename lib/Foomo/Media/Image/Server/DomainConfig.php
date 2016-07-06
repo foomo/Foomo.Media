@@ -21,6 +21,7 @@ namespace Foomo\Media\Image\Server;
 
 use Foomo\Config\AbstractConfig;
 use Foomo\Media\Image\Adaptive\RuleSet;
+use Foomo\Media\Image\Processor;
 
 /**
  * @link    www.foomo.org
@@ -107,6 +108,13 @@ class DomainConfig extends AbstractConfig
 			)
 		)
 	);
+
+	/**
+	 * jpeg image quality
+	 *
+	 * @var string
+	 */
+	public $quality = '100';
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods

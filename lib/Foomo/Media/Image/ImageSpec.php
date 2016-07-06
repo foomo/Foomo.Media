@@ -18,6 +18,7 @@
  */
 
 namespace Foomo\Media\Image;
+use Foomo\Site\DomainConfig;
 
 /**
  * @link www.foomo.org
@@ -42,6 +43,9 @@ class ImageSpec
 	{
 		$ret = new self;
 		$ret->filename = $filename;
+		if(!empty(\Foomo\Media\Module::getImageServerConfig()->quality)) {
+			$ret->quality = \Foomo\Media\Module::getImageServerConfig()->quality;
+		}
 		return $ret;
 	}
 	/**
