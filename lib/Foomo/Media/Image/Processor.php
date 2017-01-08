@@ -173,14 +173,14 @@ class Processor
 		if ($extension == 'pdf') {
 			$img->readImage($filename . '[0]');
 			//make sure we do not get inverted pdfs
-			$img = $img->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
+			$img = $img->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
 		} else if ($extension == 'mp4') {
 			$img->readImage($filename . '[50]');
 		} else {
 			$img->readImage($filename);
 		}
 		// $img->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
-		$img = $img->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
+		$img = $img->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
 		return $img;
 	}
 
