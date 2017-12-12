@@ -258,6 +258,10 @@ class Processor
 
 		$img->setResolution($resolution, $resolution);
 
+		if ($format == Processor::FORMAT_GIF) {
+			$img->coalesceImages();
+		}
+
 		if($keepAspectRatio) {
 			$originalWidth = $img->getImageWidth();
 			$originalHeight = $img->getImageHeight();
