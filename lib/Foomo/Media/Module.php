@@ -72,6 +72,6 @@ class Module extends \Foomo\Modules\ModuleBase
 	 */
 	public static function getImageServerConfig()
 	{
-		return self::getConf(DomainConfig::NAME);
+		return self::getConfig(DomainConfig::NAME);
 	}
 }
